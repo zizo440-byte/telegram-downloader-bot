@@ -1,13 +1,17 @@
 import os
 from telegram.ext import Application, CommandHandler
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-
 async def start(update, context):
     await update.message.reply_text("هلا! البوت شغال ✅")
 
-app = Application.builder().token(BOT_TOKEN).build()
+def main():
+    token = os.getenv("BOT_TOKEN")
+    if not token:
+        raise ValueError("BOT_TOKEN not set")
+    
+    app = Application.builder().token(token).build()
+    app.add_handler(CommandHandler("start", start))
+    app.run_polling()
 
-app.add_handler(CommandHandler("start", start))
-
-app.run_polling()
+if __name__ == "__main__":
+    main()
