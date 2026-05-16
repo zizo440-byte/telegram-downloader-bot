@@ -3,7 +3,7 @@ import yt_dlp
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
 async def start(update, context):
-    await update.message.reply_text("هلا! البوت شغال ✅")
+    await update.message.reply_text("هلا! أرسل لي رابط تيك توك أو يوتيوب وأنزله لك ✅")
 
 async def handle_tiktok(update, context):
     url = update.message.text
@@ -12,15 +12,20 @@ async def handle_tiktok(update, context):
     try:
         ydl_opts = {
             'outtmpl': 'video.mp4',
-            'format': 'mp4',
+            'format': 'mp4/best[filesize<200M]',
             'noplaylist': True,
             'quiet': True,
+            'max_filesize': 200 * 1024 * 1024, # 200 ميقا حد أقصى
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        await context.bot.send_video(chat_id=update.effective_chat.id, video=open('video.mp4', 'rb'))
+        await context.bot.send_document(
+            chat_id=update.effective_chat.id,
+            document=open('video.mp4', 'rb'),
+            caption="تم التحميل ✅"
+        )
         await msg.delete()
 
     except Exception as e:
@@ -30,7 +35,7 @@ def main():
     token = os.getenv("BOT_TOKEN")
     app = Application.builder().token(token).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & filters.Regex("tiktok.com"), handle_tiktok))
+    app.add_handler(MessageHandler(filters.TEXT & filters.Regex("tiktok.com|youtube.com|youtu.be"), handle_tiktok))
     app.run_polling()
 
 if __name__ == "__main__":
