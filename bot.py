@@ -30,10 +30,9 @@ try:
         f"افتحه من المتصفح وبيحمل معك بأي حجم.",
         parse_mode='Markdown'
     )
-    
+
 except Exception as e:
     await msg.edit_text(f"صار خطأ في التحميل:\n{e}")
-        await msg.edit_text(f"صار خطأ في التحميل:\n{e}")
 
 def main():
     token = os.getenv("BOT_TOKEN")
