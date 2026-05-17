@@ -13,7 +13,7 @@ async def handle_tiktok(update, context):
 
     try:
         api_url = f"https://ytapi.me/api/video/info?url={url}"
-        r = requests.get(api_url, timeout=20)
+        r = requests.get(api_url, timeout=20, verify=False)
 
         if r.status_code != 200:
             await msg.edit_text(f"الـ API رفض الطلب: {r.status_code}")
