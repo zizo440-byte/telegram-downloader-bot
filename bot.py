@@ -20,7 +20,12 @@ async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         api_url = "https://api.cobalt.tools/api/json"
-        payload = {"url": url, "videoQuality": "720", "audioFormat": "mp4"}
+        payload = {
+    "url": url,
+    "videoQuality": "720",
+    "audioFormat": "mp4",
+    "downloadMode": "auto"
+}
         headers = {"Content-Type": "application/json"}
         r = requests.post(api_url, json=payload, headers=headers, timeout=30)
 
