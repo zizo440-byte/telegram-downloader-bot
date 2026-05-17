@@ -36,4 +36,4 @@ async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = r.json()
 
         if data.get("status") not in ["stream", "success"]:
-            await msg.edit_text("ما قدرت اجيب
+            await msg.edit_text("ما قدرت اجيب الرابط")
