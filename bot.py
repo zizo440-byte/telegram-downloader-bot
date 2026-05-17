@@ -12,16 +12,21 @@ async def handle_tiktok(update, context):
     msg = await update.message.reply_text("جاري جلب رابط التحميل...")
 
     try:
-        api_url = f"https://cobrabot.xyz/api/youtube?url={url}"
+        api_url = f"https://ytapi.me/api/video/info?url={url}"
         r = requests.get(api_url, timeout=20)
+
+        if r.status_code != 200:
+            await msg.edit_text(f"الـ API رفض الطلب: {r.status_code}")
+            return
+
         data = r.json()
 
-        if data.get("status") != "success":
+        if not data.get("success") or not data.get("url"):
             await msg.edit_text("ما قدرت أجيب الرابط، جرب رابط ثاني")
             return
 
-        video_url = data["data"]["url"]
-        title = data["data"]["title"]
+        video_url = data["url"]
+        title = data.get("title", "الفيديو")
 
         await msg.edit_text(
             f"✅ **{title}**\n\n"
