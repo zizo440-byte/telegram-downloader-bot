@@ -7,13 +7,18 @@ async def start(update, context):
 
 import requests
 
+import requests
+
 async def handle_tiktok(update, context):
     url = update.message.text
     msg = await update.message.reply_text("جاري جلب رابط التحميل...")
 
     try:
-        api_url = f"https://ytapi.me/api/video/info?url={url}"
-        r = requests.get(api_url, timeout=20, verify=False)
+        api_url = "https://api.cobalt.tools/api/json"
+        payload = {"url": url}
+        headers = {"Content-Type": "application/json", "Accept": "application/json"}
+        
+        r = requests.post(api_url, json=payload, headers=headers, timeout=20)
 
         if r.status_code != 200:
             await msg.edit_text(f"الـ API رفض الطلب: {r.status_code}")
@@ -21,7 +26,7 @@ async def handle_tiktok(update, context):
 
         data = r.json()
 
-        if not data.get("success") or not data.get("url"):
+        if data.get("status") != "stream" and data.get("status") != "tunnel":
             await msg.edit_text("ما قدرت أجيب الرابط، جرب رابط ثاني")
             return
 
