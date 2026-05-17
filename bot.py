@@ -1,6 +1,6 @@
 import os
 import logging
-import requests
+import yt_dlp
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
@@ -12,52 +12,39 @@ logging.basicConfig(
 )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("أرسل لي رابط الفيديو وأنا أحمله لك")
+    await update.message.reply_text("أرسل لي رابط الفيديو وأنا أحمله لك\nالحد الأقصى للإرسال: 50 ميقا\nأكبر من كذا يرسل لك رابط تحميل")
 
 async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = update.message.text
-    msg = await update.message.reply_text("جاري التحميل...")
+    msg = await update.message.reply_text("جاري فحص الفيديو...")
 
     try:
-        api_url = "https://api.cobalt.tools/api/json"
-        payload = {
-            "url": url,
-            "videoQuality": "720",
-            "downloadMode": "auto"
+        ydl_opts = {
+            'format': 'best[filesize<50M][ext=mp4]/best[ext=mp4]',
+            'quiet': True,
+            'no_warnings': True,
         }
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "User-Agent": "telegram-bot"
-        }
-        
-        r = requests.post(api_url, json=payload, headers=headers, timeout=30)
 
-        if r.status_code != 200:
-            await msg.edit_text(f"الـ API رفض الطلب: {r.status_code}\n{ r.text}")
-            return
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            title = info.get('title', 'الفيديو')
+            filesize = info.get('filesize') or info.get('filesize_approx', 0)
+            video_url = info.get('url')
 
-        data = r.json()
-        if data.get("status") not in ["stream", "success"]:
-            await msg.edit_text(f"ما قدرت اجيب الرابط: {data.get('error', 'Unknown error')}")
-            return
+        size_mb = round(filesize / 1024 / 1024, 2) if filesize else 0
 
-        video_url = data.get("url")
-        await msg.edit_text("تم، جاري الإرسال...")
-        await context.bot.send_video(chat_id=update.effective_chat.id, video=video_url)
+        if filesize and filesize > 50 * 1024 * 1024:
+            await msg.edit_text(f"**{title}**\nالحجم: {size_mb} ميقا\nأكبر من 50 ميقا، هذا رابط التحميل المباشر:\n{video_url}")
+        else:
+            await msg.edit_text("جاري الإرسال...")
+            await context.bot.send_video(chat_id=update.effective_chat.id, video=video_url, caption=title)
+            await msg.delete()
 
     except Exception as e:
         await msg.edit_text(f"صار خطأ: {e}")
 
 def main():
     if not TOKEN:
-        print("خطأ: BOT_TOKEN مو موجود")
+        print("خطأ: TOKEN مو موجود")
         return
-    app = ApplicationBuilder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, download_video))
-    print("البوت شغال...")
-    app.run_polling()
-
-if __name__ == "__main__":
-    main()
+    app
