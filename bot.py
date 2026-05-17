@@ -12,10 +12,10 @@ async def handle_tiktok(update, context):
     try:
         ydl_opts = {
     'outtmpl': 'video.mp4',
-    'format': 'mp4/best[filesize<200M]',
+    'format': 'mp4/best[filesize<50M]',
     'noplaylist': True,
     'quiet': True,
-    'max_filesize': 200 * 1024 * 1024,
+    'max_filesize': 50 * 1024 * 1024,
     'extractor_args': {
         'youtube': {
             'player_client': ['android'],
