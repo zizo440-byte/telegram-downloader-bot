@@ -1,16 +1,17 @@
 import logging
 import requests
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
-BOT_TOKEN = "حط_توكن_البوت_هنا"
+TOKEN = "8291922417:AAGNtGfToJ5INIvUsjNvyMq1JcToRb4DqOo"
 
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO
 )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("أرسل لي رابط الفيديو من يوتيوب، تيك توك، انستا وانا انزله لك")
+    await update.message.reply_text("هلا فيك! ارسل لي رابط الفيديو وانا انزله لك")
 
 async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = update.message.text
@@ -25,7 +26,7 @@ async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "audioBitrate": "128"
         }
         headers = {"Content-Type": "application/json"}
-        r = requests.post(api_url, json=payload, headers=headers, timeout=30)
+        r = requests.post(api_url, json=payload, headers=headers)
 
         if r.status_code != 200:
             await msg.edit_text(f"الـ API رفض الطلب: {r.status_code}")
@@ -34,4 +35,23 @@ async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = r.json()
 
         if data.get("status") not in ["stream", "success"]:
-            await msg.edit_text("ما
+            await msg.edit_text("ما قدرت اجيب الرابط")
+            return
+
+        video_url = data.get("url")
+        await msg.edit_text("تم جلب الرابط بنجاح")
+        # هنا تقدر تضيف كود ارسال الفيديو
+
+    except Exception as e:
+        await msg.edit_text(f"صار خطأ: {e}")
+
+def main():
+    app = Application.builder().token(TOKEN).build()
+    
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, download_video))
+    
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
