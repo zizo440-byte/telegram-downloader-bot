@@ -1,9 +1,10 @@
+import os
 import logging
 import requests
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
-TOKEN = "8291922417:AAGNtGfToJ5INIvUsjNvyMq1JcToRb4DqOo"
+TOKEN = os.getenv("TOKEN")
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -35,23 +36,4 @@ async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = r.json()
 
         if data.get("status") not in ["stream", "success"]:
-            await msg.edit_text("ما قدرت اجيب الرابط")
-            return
-
-        video_url = data.get("url")
-        await msg.edit_text("تم جلب الرابط بنجاح")
-        # هنا تقدر تضيف كود ارسال الفيديو
-
-    except Exception as e:
-        await msg.edit_text(f"صار خطأ: {e}")
-
-def main():
-    app = Application.builder().token(TOKEN).build()
-    
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, download_video))
-    
-    app.run_polling()
-
-if __name__ == "__main__":
-    main()
+            await msg.edit_text("ما قدرت اجيب
