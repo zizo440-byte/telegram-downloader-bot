@@ -35,5 +35,11 @@ async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         data = r.json()
 
-        if data.get("status") not in ["stream", "success"]:
+if data.get("status") not in ["stream", "success"]:
             await msg.edit_text("ما قدرت اجيب الرابط")
+  return
+video_url = data.get("url")
+    await msg.edit_text("تم جلب الرابط بنجاح")
+    await context.bot.send_video(chat_id=update.effective_chat.id, video=video_url)
+ except Exception as e:
+        await msg.edit_text(f"صار خطأ: {e}")
