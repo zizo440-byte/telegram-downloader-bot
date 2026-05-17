@@ -19,7 +19,7 @@ async def handle_tiktok(update, context):
     "url": url,
     "vCodec": "h264",
     "vQuality": "720",
-    "aFormat": "mp3",
+    "aFormat": "mp4",
     "isAudioOnly": False
 }
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
