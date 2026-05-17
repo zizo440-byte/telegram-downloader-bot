@@ -15,7 +15,13 @@ async def handle_tiktok(update, context):
 
     try:
         api_url = "https://api.cobalt.tools/api/json"
-        payload = {"url": url}
+        payload = {
+    "url": url,
+    "vCodec": "h264",
+    "vQuality": "720",
+    "aFormat": "mp3",
+    "isAudioOnly": False
+}
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
         
         r = requests.post(api_url, json=payload, headers=headers, timeout=20)
