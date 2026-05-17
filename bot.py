@@ -20,11 +20,15 @@ async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         ydl_opts = {
-            'format': 'best[filesize<50M][ext=mp4]/best[ext=mp4]',
-            'quiet': True,
-            'no_warnings': True,
-            'outtmpl': 'video.%(ext)s'
-        }
+    'format': 'best[filesize<50M][ext=mp4]/best[ext=mp4]',
+    'quiet': True,
+    'no_warnings': True,
+    'outtmpl': 'video.%(ext)s',
+    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    'sleep_interval': 1,
+    'max_sleep_interval': 3,
+    'retries': 10
+}
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
