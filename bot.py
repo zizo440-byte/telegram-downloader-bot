@@ -21,21 +21,25 @@ async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         api_url = "https://api.cobalt.tools/api/json"
         payload = {
-    "url": url,
-    "videoQuality": "720",
-    "audioFormat": "mp4",
-    "downloadMode": "auto"
-}
-        headers = {"Content-Type": "application/json"}
+            "url": url,
+            "videoQuality": "720",
+            "downloadMode": "auto"
+        }
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "telegram-bot"
+        }
+        
         r = requests.post(api_url, json=payload, headers=headers, timeout=30)
 
         if r.status_code != 200:
-            await msg.edit_text(f"الـ API رفض الطلب: {r.status_code}")
+            await msg.edit_text(f"الـ API رفض الطلب: {r.status_code}\n{ r.text}")
             return
 
         data = r.json()
         if data.get("status") not in ["stream", "success"]:
-            await msg.edit_text("ما قدرت اجيب الرابط")
+            await msg.edit_text(f"ما قدرت اجيب الرابط: {data.get('error', 'Unknown error')}")
             return
 
         video_url = data.get("url")
